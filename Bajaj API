@@ -1,0 +1,157 @@
+mkdir flask-app
+cd flask-app
+python -m venv venv
+source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+pip install Flask
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.route('/bfhl', methods=['POST'])
+def post_endpoint():
+    try:
+        data = request.json.get('data', [])
+        user_id = "john_doe_17091999"
+        email = "john@xyz.com"
+        roll_number = "ABCD123"
+        
+        numbers = [item for item in data if item.isdigit()]
+        alphabets = [item for item in data if item.isalpha()]
+        highest_lowercase_alphabet = [ch for ch in alphabets if ch.islower()]
+        if highest_lowercase_alphabet:
+            highest_lowercase_alphabet = [max(highest_lowercase_alphabet)]
+        else:
+            highest_lowercase_alphabet = []
+
+        response = {
+            "is_success": True,
+            "user_id": user_id,
+            "email": email,
+            "roll_number": roll_number,
+            "numbers": numbers,
+            "alphabets": alphabets,
+            "highest_lowercase_alphabet": highest_lowercase_alphabet
+        }
+        return jsonify(response)
+    
+    except Exception as e:
+        return jsonify({"is_success": False, "error": str(e)}), 400
+
+@app.route('/bfhl', methods=['GET'])
+def get_endpoint():
+    return jsonify({"operation_code": 1})
+
+if __name__ == '__main__':
+    import os
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
+pip freeze > requirements.txt
+touch Procfile
+web: python app.py
+touch .gitignore
+venv/
+__pycache__/
+*.pyc
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.route('/bfhl', methods=['POST'])
+def post_endpoint():
+    try:
+        data = request.json.get('data', [])
+        user_id = "john_doe_17091999"
+        email = "john@xyz.com"
+        roll_number = "ABCD123"
+        
+        numbers = [item for item in data if item.isdigit()]
+        alphabets = [item for item in data if item.isalpha()]
+        highest_lowercase_alphabet = [ch for ch in alphabets if ch.islower()]
+        if highest_lowercase_alphabet:
+            highest_lowercase_alphabet = [max(highest_lowercase_alphabet)]
+        else:
+            highest_lowercase_alphabet = []
+
+        response = {
+            "is_success": True,
+            "user_id": user_id,
+            "email": email,
+            "roll_number": roll_number,
+            "numbers": numbers,
+            "alphabets": alphabets,
+            "highest_lowercase_alphabet": highest_lowercase_alphabet
+        }
+        return jsonify(response)
+    
+    except Exception as e:
+        return jsonify({"is_success": False, "error": str(e)}), 400
+
+@app.route('/bfhl', methods=['GET'])
+def get_endpoint():
+    return jsonify({"operation_code": 1})
+
+if __name__ == '__main__':
+    import os
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
+import React, { useState } from 'react';
+import axios from 'axios';
+
+const App = () => {
+  const [inputData, setInputData] = useState('');
+  const [response, setResponse] = useState(null);
+  const [error, setError] = useState('');
+  const [selectedOption, setSelectedOption] = useState('Alphabets');
+
+  const handleSubmit = async () => {
+    try {
+      const data = JSON.parse(inputData);
+      const res = await axios.post('https://your-heroku-app.herokuapp.com/bfhl', data);
+      setResponse(res.data);
+      setError('');
+    } catch (err) {
+      setError('Invalid JSON format or API error.');
+    }
+  };
+
+  const renderResponse = () => {
+    if (!response) return null;
+    switch (selectedOption) {
+      case 'Alphabets':
+        return <pre>{JSON.stringify(response.alphabets, null, 2)}</pre>;
+      case 'Numbers':
+        return <pre>{JSON.stringify(response.numbers, null, 2)}</pre>;
+      case 'Highest lowercase alphabet':
+        return <pre>{JSON.stringify(response.highest_lowercase_alphabet, null, 2)}</pre>;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div>
+      <h1>ABCD123</h1>
+      <textarea
+        rows="10"
+        cols="50"
+        value={inputData}
+        onChange={(e) => setInputData(e.target.value)}
+        placeholder='Enter JSON data here'
+      />
+      <button onClick={handleSubmit}>Submit</button>
+      {error && <div style={{ color: 'red' }}>{error}</div>}
+      {response && (
+        <div>
+          <select onChange={(e) => setSelectedOption(e.target.value)} value={selectedOption}>
+            <option value="Alphabets">Alphabets</option>
+            <option value="Numbers">Numbers</option>
+            <option value="Highest lowercase alphabet">Highest lowercase alphabet</option>
+          </select>
+          {renderResponse()}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default App;
